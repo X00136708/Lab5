@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
 // @SOURCE:/home/wdd/lab5/conf/routes
-// @DATE:Wed Mar 14 19:59:08 GMT 2018
+// @DATE:Wed Mar 14 20:22:34 GMT 2018
 
 package router
 

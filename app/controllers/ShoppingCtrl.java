@@ -54,7 +54,7 @@ public class ShoppingCtrl extends Controller {
     public Result addToBasket(Long id) {
         
        
-        Product p = Product.find.byId(id);
+        Product prod = Product.find.byId(id);
         
        
         Customer customer = (Customer)User.getLoggedIn(session().get("email"));
@@ -70,13 +70,13 @@ public class ShoppingCtrl extends Controller {
         
         
         
-        if(p.getStock() >= 1){
-            //p.setStock(p.getStock()-1);
-            customer.getBasket().addProduct(p);
-            p.update();
+        if(prod.getStock() > 0){
+            
+            customer.getBasket().addProduct(prod);
+            prod.update();
             customer.update();
         } else {
-            flash("failure", "Product " + p.getName() + " is out of stock!");
+            flash("Product: " + prod.getName() + " is out of stock...");
         }
 
              
@@ -85,33 +85,31 @@ public class ShoppingCtrl extends Controller {
     
    
     @Transactional
-    public Result addOne(Long itemId) {
+    public Result addOne(Long id) {
         
         
-        OrderItem item = OrderItem.find.byId(itemId);
+        OrderItem i = OrderItem.find.byId(id);
       
 
-        if(item.getProduct().getStock() >= 1){
-            item.increaseQty();
+        if(i.getProduct().getStock() > 0){
+            i.increaseQty();
             
         } else {
-            flash("Product: " + item.getProduct().getName() + " is out of stock...");
+            flash("Product: " + i.getProduct().getName() + " is out of stock...");
         }
 
-        item.update();
+        i.update();
         
         return redirect(routes.ShoppingCtrl.showBasket());
     }
 
     @Transactional
-    public Result removeOne(Long itemId) {
+    public Result removeOne(Long id) {
         
        
-        OrderItem item = OrderItem.find.byId(itemId);
-        
-        Customer c = getCurrentUser();
-        
-        c.getBasket().removeItem(item);
+        OrderItem i= OrderItem.find.byId(id);   
+        Customer c = getCurrentUser(); 
+        c.getBasket().removeItem(i);
 
             
 
@@ -133,7 +131,7 @@ public class ShoppingCtrl extends Controller {
     @Transactional
     public Result placeOrder() {
         Customer c = getCurrentUser();
-        Product p = new Product();
+        Product prod = new Product();
         Customer customer = (Customer)User.getLoggedIn(session().get("email"));
         
         
@@ -145,13 +143,13 @@ public class ShoppingCtrl extends Controller {
         
         order.setItems(c.getBasket().getBasketItems());
         for(OrderItem i: order.getItems()){
-            if(p.getStock() >= 1){
-                p.setStock(p.getStock()-1);
+            if(prod.getStock() >= 1){
+                prod.setStock(prod.getStock()-1);
                 
-                p.update();
+                prod.update();
                 customer.update();
             } else {
-                flash("Product " + p.getName() + " is out of stock...");
+                flash("Product " + prod.getName() + " is out of stock...");
             }
         }
         
